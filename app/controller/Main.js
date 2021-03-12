@@ -1,117 +1,101 @@
-Ext.define('ExtMVC.controller.Main', {
-    extend: 'Ext.app.Controller',
+Ext.define("ExtMVC.controller.Main", {
+  extend: "Ext.app.Controller",
 
-    models: [
-    	'ExtMVC.model.Contato'
-    ],
+  models: ["ExtMVC.model.User"],
 
-    stores: [
-    	'ExtMVC.store.Contatos'
-    ],
+  stores: ["ExtMVC.store.Users"],
 
-    views: [
-    	'ExtMVC.view.ContatosGrid',
-        'ExtMVC.view.ContatosForm'
-    ],
+  views: ["ExtMVC.view.UsersGrid", "ExtMVC.view.UsersForm"],
 
-    init: function(application){
-        this.control({
-            "contatosgrid": {
-                render : this.onGridRender,
-                itemdblclick : this.onEditClick
-            },
-            "contatosgrid button#add": {
-                click : this.onAddClick
-            },
-            "contatosgrid button#delete": {
-                click : this.onDeleteClick
-            },
-            "contatosform button#cancel": {
-                click : this.onCancelClick
-            },
-            "contatosform button#save": {
-                click : this.onSaveClick
-            }
-        });
-    },
+  init: function (application) {
+    this.control({
+      usersgrid: {
+        render: this.onGridRender,
+        itemdblclick: this.onEditClick,
+      },
+      "usersgrid button#add": {
+        click: this.onAddClick,
+      },
+      "usersform button#cancel": {
+        click: this.onCancelClick,
+      },
+      "usersgrid button#delete": {
+        click: this.onDeleteClick,
+      },
+      "usersform button#save": {
+        click: this.onSaveClick,
+      },
+    });
+  },
 
-    onGridRender: function(grid, eOpts){
-        grid.getStore().load();
-    },
+  onGridRender: function (grid, eOpts) {
+    grid.getStore().load();
+  },
 
-    openForm: function(title){
+  openForm: function (title) {
+    var win = Ext.create("ExtMVC.view.UsersForm");
 
-        var win = Ext.create('ExtMVC.view.ContatosForm');
+    win.setTitle(title);
 
-        win.setTitle(title);
+    return win;
+  },
 
-        return win;
-    },
+  onAddClick: function (btn, e, eOpts) {
+    this.openForm("Novo User");
+  },
+  onEditClick: function (grid, record, item, index, e, eOpts) {
+    var win = this.openForm("Editar User - " + record.get("name"));
 
-    onAddClick: function(btn, e, eOpts ){
-        
-        this.openForm('Novo Contato');
-    },
+    var form = win.down("form");
 
-    onEditClick: function(grid, record, item, index, e, eOpts){
+    form.loadRecord(record);
+  },
+  onCancelClick: function (btn, e, eOpts) {
+    var win = btn.up("window");
 
-        var win = this.openForm('Editar Contato - ' + record.get('name'));
+    var form = win.down("form");
 
-        var form = win.down('form');
+    form.getForm().reset();
 
-        form.loadRecord(record);
-    },
+    win.close();
+  },
 
-    onCancelClick: function(btn, e, eOpts){
-        
-        var win = btn.up('window');
+  onDeleteClick: function (btn, e, eOpts) {
+    var grid = btn.up("grid");
 
-        var form = win.down('form');
+    var records = grid.getSelectionModel().getSelection();
 
-        form.getForm().reset();
+    var store = grid.getStore();
 
-        win.close();
-    },
+    store.remove(records);
 
-    onDeleteClick: function(btn, e, eOpts){
+    store.sync();
+  },
+  onSaveClick: function (btn, e, eOpts) {
+    var win = btn.up("window"),
+      form = win.down("form"),
+      values = form.getValues(),
+      record = form.getRecord(),
+      grid = Ext.ComponentQuery.query("usersgrid")[0],
+      store = grid.getStore();
 
-        var grid = btn.up('grid');
+    if (record) {
+      //edicao
 
-        var records = grid.getSelectionModel().getSelection();
+      record.set(values);
+    } else {
+      //novo registro
 
-        var store = grid.getStore();
+      var contato = Ext.create("ExtMVC.model.User", {
+        name: values.name,
+        age: values.age,
+      });
 
-        store.remove(records);
+      store.insert(0, contato);
+    }
 
-        store.sync();
-    },
+    store.sync();
 
-    onSaveClick: function(btn, e, eOpts){
-
-        var win = btn.up('window'),
-            form = win.down('form'),
-            values = form.getValues(),
-            record = form.getRecord(),
-            grid = Ext.ComponentQuery.query('contatosgrid')[0],
-            store = grid.getStore();
-
-        if (record){ //edicao
-            
-            record.set(values);
-
-        } else { //novo registro 
-
-            var contato = Ext.create('ExtMVC.model.Contato',{
-                name: values.name,
-                phone: values.phone,
-                email: values.email
-            });
-
-            store.insert(0,contato);
-        }
-
-        store.sync();
-
-        win.close();
-    }    
+    win.close();
+  },
 });

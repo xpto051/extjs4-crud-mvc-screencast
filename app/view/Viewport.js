@@ -1,15 +1,14 @@
-Ext.define('ExtMVC.view.Viewport', {
-    extend: 'Ext.container.Viewport',
-    requires:[
-        'Ext.layout.container.Fit',
-        'ExtMVC.view.ContatosGrid'
-    ],
+Ext.define("ExtMVC.view.Viewport", {
+  extend: "Ext.container.Viewport",
+  requires: ["Ext.layout.container.Fit", "ExtMVC.view.UsersGrid"],
 
-    layout: {
-        type: 'fit'
+  layout: {
+    type: "fit",
+  },
+
+  items: [
+    {
+      xtype: "usersgrid",
     },
-
-    items: [{
-        xtype: 'contatosgrid'
-    }]
+  ],
 });

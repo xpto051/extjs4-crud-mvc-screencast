@@ -1,21 +1,15 @@
 <?php
- 
-//nome do servidor (127.0.0.1)
-$servidor = "127.0.0.1";
- 
-//usuário do banco de dados
-$user = "root";
- 
-//senha do banco de dados
-$senha = "";
- 
-//nome da base de dados
-$db = "blog";
- 
-//executa a conexão com o banco, caso contrário mostra o erro ocorrido
-$conexao = mysql_connect($servidor,$user,$senha) or die (mysql_error());
- 
-//seleciona a base de dados daquela conexão, caso contrário mostra o erro ocorrido
-$banco = mysql_select_db($db, $conexao) or die(mysql_error());
- 
+  $connection_str = "mongodb://localhost:27017";
+
+
+  $driver_connection = new MongoDB\Driver\Manager($connection_str);
+  $insert_data = new MongoDB\Driver\BulkWrite;
+  $query_data = new MongoDB\Driver\Query([], ['sort' => ['namer'=> 1]]);
+  $connect_arr = array(
+    'insert_data' => $insert_data,
+    'driver_connection' => $driver_connection,
+    'query'=>$query_data
+    );
+
+  return $connect_arr;
 ?>
